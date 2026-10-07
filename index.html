@@ -1,1230 +1,375 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ulzhan Khamidolla</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="description" content="Ulzhan (Jane) Khamidolla. Systems and ML software: an LLM inference engine in C, embedded firmware, research pipelines. UC Berkeley, class of 2029.">
+<meta name="theme-color" content="#0B1021">
+<meta property="og:title" content="Ulzhan Khamidolla"><meta property="og:description" content="Systems and ML software. UC Berkeley, class of 2029."><meta property="og:type" content="profile">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Ulzhan Khamidolla","alternateName":"Jane Khamidolla","email":"mailto:khamidolla.ulzhan@gmail.com","url":"https://www.linkedin.com/in/ulzhan-khamidolla/","sameAs":["https://www.linkedin.com/in/ulzhan-khamidolla/","https://github.com/janeulzhan"],"affiliation":{"@type":"CollegeOrUniversity","name":"University of California, Berkeley"}}</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B1021'/%3E%3Ctext x='10' y='44' font-family='monospace' font-size='32' font-weight='600' fill='%236EE7D1'%3Euk%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #f7f5f0;
-    --cream-dark: #ede9e1;
-    --ink: #1a1714;
-    --ink-mid: #4a4540;
-    --ink-light: #8a8580;
-    --violet: #5340c8;
-    --violet-light: #ede9ff;
-    --teal: #0f8c6e;
-    --teal-light: #e2f5ef;
-    --amber: #c4760a;
-    --amber-light: #fef3e0;
-    --serif: 'DM Serif Display', Georgia, serif;
-    --sans: 'Instrument Sans', sans-serif;
-    --mono: 'DM Mono', monospace;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: var(--sans);
-    background: var(--cream);
-    color: var(--ink);
-    font-size: 16px;
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--cream);
-    border-bottom: 1px solid var(--cream-dark);
-    padding: 0 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-  }
-  .nav-logo {
-    font-family: var(--serif);
-    font-size: 1.25rem;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--violet); }
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-  }
-  .nav-links a {
-    font-size: 0.8125rem;
-    color: var(--ink-mid);
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--violet); }
-  .nav-cta {
-    font-size: 0.8125rem;
-    padding: 7px 18px;
-    border: 1.5px solid var(--violet);
-    border-radius: 100px;
-    color: var(--violet);
-    text-decoration: none;
-    transition: all 0.2s;
-    font-weight: 500;
-  }
-  .nav-cta:hover { background: var(--violet); color: #fff; }
-
-  /* ── HERO ── */
-  .hero {
-    min-height: 92vh;
-    display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 4rem;
-    align-items: center;
-    padding: 5rem 2.5rem 4rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .hero-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: var(--ink-light);
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-  }
-  .pulse {
-    width: 7px; height: 7px;
-    background: var(--teal);
-    border-radius: 50%;
-    animation: pulse 2.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
-  }
-
-  .hero h1 {
-    font-family: var(--serif);
-    font-size: clamp(2.8rem, 5vw, 4.2rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    margin-bottom: 1.5rem;
-  }
-  .hero h1 em {
-    font-style: italic;
-    color: var(--violet);
-  }
-
-  .hero-sub {
-    font-size: 1rem;
-    color: var(--ink-mid);
-    max-width: 480px;
-    line-height: 1.75;
-    margin-bottom: 2rem;
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .btn-primary {
-    display: inline-block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 11px 24px;
-    background: var(--violet);
-    color: #fff;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
-  }
-  .btn-primary:hover { background: #4230a8; transform: translateY(-1px); }
-  .btn-ghost {
-    display: inline-block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 11px 24px;
-    background: transparent;
-    color: var(--ink-mid);
-    border-radius: 8px;
-    text-decoration: none;
-    border: 1.5px solid var(--cream-dark);
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .btn-ghost:hover { border-color: var(--ink-mid); color: var(--ink); }
-
-  /* hero right side — world map dots */
-  .hero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .world-card {
-    background: #fff;
-    border: 1px solid var(--cream-dark);
-    border-radius: 16px;
-    padding: 1.5rem;
-  }
-  .world-label {
-    font-size: 0.6875rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    margin-bottom: 1rem;
-    font-weight: 500;
-  }
-  .globe-dots {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 1rem;
-  }
-  .location-pin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: default;
-  }
-  .pin-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    border: 2px solid var(--violet);
-    background: var(--violet-light);
-    transition: all 0.2s;
-  }
-  .location-pin:hover .pin-dot {
-    background: var(--violet);
-    transform: scale(1.3);
-  }
-  .pin-name {
-    font-size: 0.625rem;
-    color: var(--ink-light);
-    text-align: center;
-    line-height: 1.3;
-  }
-
-  .stat-mini-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .stat-mini {
-    background: var(--cream);
-    border-radius: 10px;
-    padding: 0.875rem 1rem;
-  }
-  .stat-mini-num {
-    font-family: var(--serif);
-    font-size: 1.625rem;
-    line-height: 1;
-    color: var(--ink);
-    margin-bottom: 3px;
-  }
-  .stat-mini-label {
-    font-size: 0.6875rem;
-    color: var(--ink-light);
-    line-height: 1.4;
-  }
-
-  /* scroll indicator */
-  .scroll-hint {
-    position: absolute;
-    bottom: 2rem;
-    left: 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.6875rem;
-    color: var(--ink-light);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .scroll-line {
-    width: 32px;
-    height: 1px;
-    background: var(--ink-light);
-    animation: scrollline 2s ease-in-out infinite;
-  }
-  @keyframes scrollline {
-    0%,100% { width: 32px; opacity: 1; }
-    50% { width: 16px; opacity: 0.4; }
-  }
-
-  /* ── SECTIONS ── */
-  section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 5rem 2.5rem;
-  }
-  .section-full {
-    background: #fff;
-    border-top: 1px solid var(--cream-dark);
-    border-bottom: 1px solid var(--cream-dark);
-  }
-  .section-full > .inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 5rem 2.5rem;
-  }
-
-  .section-label {
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-  .section-title {
-    font-family: var(--serif);
-    font-size: 2.25rem;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin-bottom: 3rem;
-  }
-  .section-title em { font-style: italic; color: var(--violet); }
-
-  /* ── PROJECTS ── */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-  .project-card {
-    background: #fff;
-    border: 1px solid var(--cream-dark);
-    border-radius: 16px;
-    padding: 1.75rem;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .project-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--violet);
-    transform: scaleX(0);
-    transition: transform 0.3s;
-    transform-origin: left;
-  }
-  .project-card:hover { transform: translateY(-3px); border-color: #d0ccc8; }
-  .project-card:hover::before { transform: scaleX(1); }
-
-  .project-card.teal::before { background: var(--teal); }
-  .project-card.amber::before { background: var(--amber); }
-
-  .proj-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 100px;
-    margin-bottom: 1rem;
-  }
-  .tag-violet { background: var(--violet-light); color: var(--violet); }
-  .tag-teal { background: var(--teal-light); color: var(--teal); }
-  .tag-amber { background: var(--amber-light); color: var(--amber); }
-  .tag-gray { background: var(--cream); color: var(--ink-mid); }
-
-  .proj-title {
-    font-family: var(--serif);
-    font-size: 1.375rem;
-    margin-bottom: 0.625rem;
-    line-height: 1.25;
-  }
-  .proj-desc {
-    font-size: 0.875rem;
-    color: var(--ink-mid);
-    line-height: 1.7;
-    margin-bottom: 1.25rem;
-  }
-  .proj-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    color: var(--ink-light);
-    border-top: 1px solid var(--cream-dark);
-    padding-top: 0.875rem;
-    margin-top: auto;
-  }
-  .proj-award {
-    font-weight: 500;
-    color: var(--amber);
-  }
-
-  /* featured project */
-  .project-card.featured {
-    grid-column: span 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: center;
-    background: var(--ink);
-    border-color: var(--ink);
-    color: #fff;
-  }
-  .project-card.featured::before { background: var(--violet-light); }
-  .project-card.featured .proj-title { color: #fff; }
-  .project-card.featured .proj-desc { color: rgba(255,255,255,0.65); }
-  .project-card.featured .proj-footer { border-color: rgba(255,255,255,0.12); }
-  .project-card.featured .proj-award { color: #f0c567; }
-  .project-card.featured .proj-footer { color: rgba(255,255,255,0.4); }
-
-  .featured-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .metric-row {
-    display: flex;
-    gap: 1.5rem;
-  }
-  .metric {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    flex: 1;
-  }
-  .metric-val {
-    font-family: var(--serif);
-    font-size: 1.75rem;
-    color: #fff;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .metric-label {
-    font-size: 0.6875rem;
-    color: rgba(255,255,255,0.45);
-    line-height: 1.4;
-  }
-  .tech-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .tech-pill {
-    font-family: var(--mono);
-    font-size: 0.6875rem;
-    padding: 4px 10px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 4px;
-    color: rgba(255,255,255,0.7);
-  }
-
-  /* ── BETS ── */
-  .bets-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    border: 1px solid var(--cream-dark);
-    border-radius: 16px;
-    overflow: hidden;
-    background: #fff;
-  }
-  .bet-item {
-    padding: 1.75rem;
-    border-bottom: 1px solid var(--cream-dark);
-    border-right: 1px solid var(--cream-dark);
-    transition: background 0.2s;
-  }
-  .bet-item:nth-child(2n) { border-right: none; }
-  .bet-item:nth-last-child(-n+2) { border-bottom: none; }
-  .bet-item:hover { background: var(--cream); }
-  .bet-num {
-    font-family: var(--mono);
-    font-size: 0.6875rem;
-    color: var(--ink-light);
-    margin-bottom: 0.75rem;
-  }
-  .bet-text {
-    font-size: 0.9375rem;
-    line-height: 1.65;
-    color: var(--ink);
-    margin-bottom: 0.625rem;
-    font-weight: 500;
-  }
-  .bet-sub {
-    font-size: 0.8125rem;
-    color: var(--ink-light);
-    line-height: 1.55;
-    font-style: italic;
-  }
-
-  /* ── TIMELINE ── */
-  .timeline {
-    position: relative;
-    padding-left: 2rem;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 8px; bottom: 8px;
-    width: 1px;
-    background: var(--cream-dark);
-  }
-  .tl-item {
-    position: relative;
-    padding-left: 1.75rem;
-    padding-bottom: 2.5rem;
-  }
-  .tl-item:last-child { padding-bottom: 0; }
-  .tl-dot {
-    position: absolute;
-    left: -2.375rem;
-    top: 6px;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--cream);
-    border: 2px solid var(--cream-dark);
-    transition: all 0.2s;
-  }
-  .tl-item:hover .tl-dot {
-    background: var(--violet);
-    border-color: var(--violet);
-  }
-  .tl-year {
-    font-family: var(--mono);
-    font-size: 0.6875rem;
-    color: var(--ink-light);
-    margin-bottom: 0.25rem;
-  }
-  .tl-title {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .tl-org {
-    font-size: 0.8125rem;
-    color: var(--violet);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-  }
-  .tl-desc {
-    font-size: 0.8125rem;
-    color: var(--ink-mid);
-    line-height: 1.65;
-  }
-
-  /* ── AWARDS ── */
-  .awards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  .award-card {
-    background: #fff;
-    border: 1px solid var(--cream-dark);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-  .award-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.625rem;
-  }
-  .award-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 3px;
-    line-height: 1.35;
-  }
-  .award-org {
-    font-size: 0.75rem;
-    color: var(--ink-light);
-    line-height: 1.4;
-  }
-
-  /* ── ASK ME ── */
-  .ask-section {
-    background: var(--ink);
-    color: #fff;
-    border-top: none;
-    border-bottom: none;
-  }
-  .ask-section .inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-  .ask-left .section-label { color: rgba(255,255,255,0.35); }
-  .ask-title {
-    font-family: var(--serif);
-    font-size: 2.25rem;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin-bottom: 1rem;
-    color: #fff;
-  }
-  .ask-title em { font-style: italic; color: #a89fea; }
-  .ask-sub { font-size: 0.9375rem; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 1.5rem; }
-
-  .chat-window {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    overflow: hidden;
-  }
-  .chat-header {
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.4);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .chat-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
-  .chat-messages {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    min-height: 200px;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-  .msg {
-    max-width: 85%;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    line-height: 1.55;
-  }
-  .msg-user {
-    background: var(--violet);
-    color: #fff;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-  }
-  .msg-ai {
-    background: rgba(255,255,255,0.07);
-    color: rgba(255,255,255,0.85);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-  }
-  .msg-typing {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    padding: 0.75rem 1rem;
-  }
-  .typing-dot {
-    width: 6px; height: 6px;
-    background: rgba(255,255,255,0.35);
-    border-radius: 50%;
-    animation: typingbounce 1.2s ease-in-out infinite;
-  }
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes typingbounce {
-    0%,100% { transform: translateY(0); opacity: 0.35; }
-    50% { transform: translateY(-4px); opacity: 0.9; }
-  }
-  .chat-input-row {
-    display: flex;
-    gap: 8px;
-    padding: 0.875rem 1.25rem;
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .chat-input {
-    flex: 1;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 9px 14px;
-    font-size: 0.875rem;
-    color: #fff;
-    outline: none;
-    font-family: var(--sans);
-    transition: border-color 0.2s;
-  }
-  .chat-input::placeholder { color: rgba(255,255,255,0.3); }
-  .chat-input:focus { border-color: rgba(255,255,255,0.25); }
-  .chat-send {
-    padding: 9px 16px;
-    background: var(--violet);
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 0.875rem;
-    cursor: pointer;
-    font-family: var(--sans);
-    font-weight: 500;
-    transition: background 0.2s;
-  }
-  .chat-send:hover { background: #4230a8; }
-  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .sample-questions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-  }
-  .sample-q {
-    font-size: 0.75rem;
-    padding: 6px 12px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 100px;
-    color: rgba(255,255,255,0.55);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .sample-q:hover {
-    background: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.85);
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 3rem 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--cream-dark);
-  }
-  .footer-left .footer-name {
-    font-family: var(--serif);
-    font-size: 1.125rem;
-    margin-bottom: 4px;
-  }
-  .footer-left p { font-size: 0.8125rem; color: var(--ink-light); }
-  .footer-links {
-    display: flex;
-    gap: 1.5rem;
-  }
-  .footer-links a {
-    font-size: 0.8125rem;
-    color: var(--ink-light);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--violet); }
-
-  /* ── ANIMATIONS ── */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .fade-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .fade-up:nth-child(2) { transition-delay: 0.1s; }
-  .fade-up:nth-child(3) { transition-delay: 0.2s; }
-  .fade-up:nth-child(4) { transition-delay: 0.3s; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .hero { grid-template-columns: 1fr; gap: 3rem; padding-top: 3rem; }
-    .hero-right { display: none; }
-    .projects-grid { grid-template-columns: 1fr; }
-    .project-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
-    .bets-container { grid-template-columns: 1fr; }
-    .awards-grid { grid-template-columns: 1fr 1fr; }
-    .ask-section .inner { grid-template-columns: 1fr; }
-    nav .nav-links { display: none; }
-  }
+:root{color-scheme:dark;--bg:#0B1021;--bg-2:#0F1630;--card:rgba(120,140,200,.07);--card-b:rgba(120,140,200,.14);--line:#1C2544;
+  --fg:#DDE3F3;--fg-2:#A9B3CC;--mute:#7C87A6;--dim:#55608A;--acc:#6EE7D1;--acc-2:#3FC7AE;
+  --mono:"IBM Plex Mono","SFMono-Regular",ui-monospace,Menlo,monospace;--sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{background:var(--bg);scroll-behavior:smooth;scroll-padding-top:96px}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--fg-2);font:400 16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:var(--acc);color:#062}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:3px;border-radius:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--acc);color:#062;padding:8px 12px;font:500 13px var(--mono)}
+.skip:focus{top:12px}
+#grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(124,135,166,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(124,135,166,.07) 1px,transparent 1px);background-size:48px 48px;-webkit-mask:radial-gradient(60% 60% at 50% 40%,#000,transparent);mask:radial-gradient(60% 60% at 50% 40%,#000,transparent)}
+#spot{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(600px circle at var(--x,50%) var(--y,30%),rgba(110,231,209,.06),transparent 70%)}
+.wrap{position:relative;z-index:1;width:min(1180px,100% - 48px);margin-inline:auto;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:clamp(40px,8vw,120px)}
+@media (max-width:1024px){.wrap{display:block}}
+/* left column */
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:88px 0 64px}
+@media (max-width:1024px){.side{position:static;height:auto;padding:72px 0 24px}}
+.portrait{margin:0 0 26px;display:flex;align-items:flex-end;gap:14px}
+.portrait canvas{width:176px;height:176px;image-rendering:pixelated;border-radius:8px;background:#0C1228;box-shadow:0 0 0 1px var(--line);cursor:grab;touch-action:none}
+.portrait canvas:active{cursor:grabbing}
+.pt-cap{font:400 11px/1.6 var(--mono);color:var(--dim);margin-bottom:8px}
+.skies{margin:0 0 28px;width:224px}.skies canvas{display:block;width:224px;height:128px;image-rendering:pixelated;border-radius:6px;box-shadow:0 0 0 1px var(--line)}
+.sky-cap{display:flex;justify-content:space-between;margin-top:8px;font:400 11.5px/1 var(--mono);color:var(--mute)}
+.side h1{margin:0;font:600 clamp(34px,3.8vw,46px)/1.05 var(--sans);letter-spacing:-.03em;color:var(--fg)}
+.side h1 small{display:block;font:500 clamp(17px,1.5vw,20px)/1.4 var(--sans);letter-spacing:-.01em;color:var(--fg);margin-top:12px}
+.spec{margin:18px 0 0;display:grid;grid-template-columns:52px 1fr;gap:5px 14px;font:400 13px/1.55 var(--mono);color:var(--fg-2)}.spec dt{color:var(--mute)}.spec dd{margin:0}
+.side .prompt{font:400 12.5px/1.6 var(--mono);color:var(--mute);margin:0 0 14px}
+.side .prompt b{color:var(--acc);font-weight:500}.side .prompt i{font-style:normal;color:#F2B544}
+.snav{margin:56px 0 0;padding:0;list-style:none}
+.snav a{display:flex;align-items:center;gap:14px;padding:8px 0;font:500 13px/1 var(--sans);color:var(--mute);transition:color .2s}
+.snav a.ext{margin-top:14px;color:var(--acc-2)}.snav a.ext:hover{color:var(--acc)}
+.snav a i{width:32px;height:1px;background:var(--mute);transition:width .25s var(--e),background .2s;--e:cubic-bezier(.2,.8,.2,1)}
+.snav a:hover,.snav a[aria-current=true]{color:var(--fg)}
+.snav a:hover i,.snav a[aria-current=true] i{width:64px;background:var(--fg)}
+@media (max-width:1024px){.snav{display:none}}
+.social{margin-top:auto;display:flex;gap:18px;align-items:center;font:500 12.5px/1 var(--mono);color:var(--mute)}
+.social a{display:inline-flex;align-items:center;gap:7px;transition:color .2s}.social a:hover{color:var(--acc)}
+.social svg{width:17px;height:17px}
+.meta-row{display:flex;gap:18px;margin-top:16px;font:400 11.5px/1 var(--mono);color:var(--dim)}.meta-row span{display:inline-flex;align-items:center;gap:7px}.meta-row .px{width:12px;height:12px}
+@media (max-width:1024px){.social{margin-top:28px}}
+/* right column */
+.main{padding:88px 0 96px}
+@media (max-width:1024px){.main{padding:0 0 64px}}
+section{padding:0 0 88px;scroll-margin-top:88px}
+.h{display:flex;align-items:center;gap:10px;margin:0 0 22px;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+.h .n{color:var(--acc)}.h canvas{width:14px;height:14px;image-rendering:pixelated}
+.h::after{content:"";flex:1;height:1px;background:var(--line);margin-left:8px}
+.h{text-transform:none;letter-spacing:0;font:500 15px/1 var(--sans)}
+.about p{margin:0 0 18px;max-width:62ch}.about b{color:var(--fg);font-weight:500}
+.about a{color:var(--fg);border-bottom:1px solid var(--dim)}.about a:hover{color:var(--acc);border-color:var(--acc)}
+.terse{margin:0;padding:0;list-style:none}.terse li{position:relative;padding:7px 0 7px 18px;border-top:1px solid var(--line);font-size:15px;line-height:1.55}.terse li:first-child{border-top:0}.terse li::before{content:"–";position:absolute;left:2px;color:var(--mute)}
+.now{margin:22px 0 0;padding:0;list-style:none;font:400 13px/1.8 var(--mono);color:var(--fg-2)}.now li{display:grid;grid-template-columns:90px 1fr;gap:12px;padding:6px 0;border-top:1px solid var(--line)}.now li span{color:var(--mute)}
+/* pixel glyph system */
+.px{width:16px;height:16px;image-rendering:pixelated;flex:none;display:block}
+.px.lg{width:24px;height:24px}
+.card .ico{position:absolute;left:20px;top:22px}
+.card .mk svg{width:14px;height:14px}
+section{position:relative}
+section+section::before{content:"";position:absolute;left:0;top:-44px;width:100%;height:4px;background-image:repeating-linear-gradient(90deg,var(--line) 0 4px,transparent 4px 10px);opacity:.9}
+/* cards */
+.cards{display:grid;gap:4px}
+.card{display:grid;grid-template-columns:110px 1fr;gap:6px 22px;padding:18px 20px 18px 54px;border-radius:6px;border:1px solid transparent;transition:background .25s,border-color .25s,transform .25s;position:relative}
+.card:hover{background:var(--card);border-color:var(--card-b)}
+.card .when{font:400 12px/1.6 var(--mono);color:var(--mute);padding-top:3px}
+.card .ico{opacity:.85;transition:transform .25s,opacity .25s}.card:hover .ico{opacity:1;transform:translateY(-1px)}
+.card h3{margin:0;font:500 16px/1.35 var(--sans);color:var(--fg);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h3 .org{color:var(--mute)}.card .out{position:relative;z-index:2;border-bottom:1px solid var(--dim)}.card .out:hover{color:var(--acc);border-color:var(--acc)}.card:hover h3,.card:hover h3 .org{color:var(--acc)}
+.card h3 .mk{width:14px;height:14px;display:inline-grid;margin:0 4px 0 2px;vertical-align:-2px}.card h3 .mk svg{width:14px;height:14px}
+.card p{margin:4px 0 0;font-size:14.5px;color:var(--fg-2);max-width:58ch}
+.card ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:0 10px}
+.card li{font:400 12px/1.6 var(--mono);color:var(--mute)}.card li.m{color:var(--acc-2)}
+.card a.cover{position:absolute;inset:0;border-radius:6px}
+.card .arr{position:absolute;right:18px;top:18px;color:var(--mute);font-family:var(--mono);transition:transform .25s,color .25s}
+.card:hover .arr{transform:translate(2px,-2px);color:var(--acc)}
+@media (max-width:640px){.card{grid-template-columns:1fr;gap:4px}}
+.more{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font:600 13.5px/1 var(--sans);color:var(--fg);border-bottom:1px solid transparent}
+.more:hover{color:var(--acc)}.more i{font-style:normal;transition:transform .2s}.more:hover i{transform:translateX(3px)}
+/* recognition list */
+.rec{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.rec li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 16px;border-radius:6px;border:1px solid transparent}
+.rec li:hover{background:var(--card);border-color:var(--card-b)}
+.rec .mk{width:16px;height:16px}.rec .mk svg{width:16px;height:16px;display:block}
+.rec .mk.t{font:500 11px/16px var(--mono);color:var(--acc);text-align:center}
+.rec b{display:block;font-weight:500;color:var(--fg);font-size:15px}.rec span{font-size:13.5px;color:var(--mute)}
+.rec .yr{font:500 11.5px/1 var(--mono);color:var(--dim)}
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.skills h3{margin:0 0 8px;font:500 13px/1 var(--sans);color:var(--mute)}
+.skills p{margin:0;font:400 13.5px/1.9 var(--mono);color:var(--fg-2)}
+@media (max-width:760px){.skills{grid-template-columns:1fr}}
+/* footer */
+.foot{font:400 12.5px/1.8 var(--mono);color:var(--dim);border-top:1px solid var(--line);padding-top:22px}
+.foot a{color:var(--mute)}.foot a:hover{color:var(--acc)}
+/* subpages */
+.page{display:none}.page.on{display:block}
+.inner{position:relative;z-index:1;width:min(1180px,100% - 48px);margin-inline:auto;padding:88px 0 96px}
+.inner .back{font:500 12.5px/1 var(--mono);color:var(--mute)}.inner .back:hover{color:var(--acc)}
+.inner h1{margin:18px 0 8px;font:600 clamp(34px,4.4vw,52px)/1.05 var(--sans);letter-spacing:-.03em;color:var(--fg)}
+.inner .lede{margin:0 0 28px;color:var(--fg-2);max-width:48ch}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 20px;font:500 12px/1 var(--mono)}
+.filters button{color:var(--mute);background:transparent;border:1px solid var(--line);padding:7px 10px;border-radius:999px;cursor:pointer;font:inherit}
+.filters button[aria-pressed=true]{color:#062;background:var(--acc);border-color:var(--acc)}
+.entry{display:grid;grid-template-columns:150px 1fr;gap:10px 28px;padding:26px 0;border-bottom:1px solid var(--line)}
+.entry[hidden]{display:none}
+.entry .when{font:400 12px/1.6 var(--mono);color:var(--mute)}
+.entry .when b{display:block;color:var(--fg);font-weight:500;letter-spacing:0;text-transform:none;font-size:13px}
+.entry h3{margin:0;font:500 20px/1.25 var(--sans);color:var(--fg)}
+.entry .org{display:flex;gap:8px;align-items:center;margin:4px 0 0;color:var(--fg-2)}.entry .org .mk{width:14px;height:14px}.entry .org .mk svg{width:14px;height:14px;display:block}
+.entry .about{color:var(--mute);font-size:14px;margin:2px 0 0}
+.entry ul{margin:12px 0 0;padding-left:0;list-style:none;max-width:62ch}
+.entry li{position:relative;padding-left:18px;margin:6px 0;font-size:15px}.entry li::before{content:"▹";position:absolute;left:0;color:var(--acc)}
+@media (max-width:760px){.entry{grid-template-columns:1fr;gap:4px}}
+.fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+.fun-grid article{background:var(--card);border:1px solid var(--card-b);border-radius:8px;padding:22px 24px}
+.fun-grid h3{margin:0 0 4px;font:500 17px/1.3 var(--sans);color:var(--fg)}.fun-grid .k{font:500 12px/1.6 var(--mono);color:var(--acc-2)}
+.fun-grid p{margin:8px 0 0;color:var(--fg-2);font-size:15px}.fun-grid article.wide{grid-column:1/-1}
+.pad{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;margin-top:12px}
+.pad canvas{width:100%;height:320px;background:#0A0F22;border:1px solid var(--line);cursor:crosshair;touch-action:none;display:block;border-radius:6px}
+.pad .tools{display:grid;gap:6px;font:500 12px/1 var(--mono)}
+.pad .tools button{color:var(--fg-2);background:transparent;border:1px solid var(--line);padding:7px 10px;border-radius:4px;cursor:pointer;font:inherit;text-align:left}
+.pad .tools button[aria-pressed=true]{color:#062;background:var(--acc);border-color:var(--acc)}
+.grades{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font:500 12px/1 var(--mono)}
+.grades span{border:1px solid var(--line);padding:6px 9px;border-radius:4px;color:var(--mute)}.grades span.on{color:#062;background:var(--acc);border-color:var(--acc)}
+@media (max-width:760px){.fun-grid{grid-template-columns:1fr}.pad{grid-template-columns:1fr}.pad .tools{grid-auto-flow:column}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+@media print{body{background:#fff;color:#000}#spot,.snav,.social svg,.foot,.pad,.filters{display:none!important}.page{display:block!important}.side{position:static;height:auto}.wrap{display:block}.card,.rec li{border-color:#ddd}.card h3,.side h1,.h,.rec b{color:#000}}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+<div id="grid" aria-hidden="true"></div>
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Ulzhan<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#work">work</a></li>
-    <li><a href="#research">research</a></li>
-    <li><a href="#bets">bets</a></li>
-    <li><a href="#ask">ask me</a></li>
-  </ul>
-  <a href="mailto:khamidolla.ulzhan@gmail.com" class="nav-cta">say hello</a>
-</nav>
+<div class="page on" data-page="home">
+<div class="wrap">
+  <aside class="side">
+    <div class="skies" aria-label="Current time of day in Berkeley and in Astana"><canvas id="sky" width="112" height="64"></canvas><div class="sky-cap"><span id="sky-a">Berkeley --:--</span><span id="sky-b">Astana --:--</span></div></div>
+    <h1>Ulzhan Khamidolla</h1>
+    <dl class="spec">
+      <dt>alias</dt><dd>Jane</dd>
+      <dt>at</dt><dd>UC Berkeley · Data Science (intended) · '29</dd>
+      <dt>does</dt><dd>LLM inference, embedded C, ML pipelines</dd>
+      <dt>now</dt><dd>Hurley Lab · Social Psychology &amp; Business Lab</dd>
+      <dt>was</dt><dd>co-founder, Quat · platform dev, Silkroad Innovation Hub</dd>
+    </dl>
+    <ul class="snav">
+      <li><a href="#about" data-s="about"><i></i>About</a></li>
+      <li><a href="#experience" data-s="experience"><i></i>Work</a></li>
+      <li><a href="#projects" data-s="projects"><i></i>Projects</a></li>
+      <li><a href="#recognition" data-s="recognition"><i></i>Awards</a></li>
+      <li><a href="#skills" data-s="skills"><i></i>Skills</a></li>
+      <li><a href="#/work" class="ext"><i></i>Full work history</a></li>
+      <li><a href="#/fun" class="ext" style="margin-top:0"><i></i>Fun</a></li>
+    </ul>
+    <div class="social">
+      <a href="https://github.com/janeulzhan" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.780.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.550-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>github</a>
+      <a href="https://www.linkedin.com/in/ulzhan-khamidolla/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.5h4V21H3V9.5Zm6.5 0h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.2c0-1.24-.02-2.84-1.73-2.84-1.73 0-2 1.35-2 2.75V21h-4V9.5Z"/></svg>linkedin</a>
+      <a href="mailto:khamidolla.ulzhan@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>email</a>
+      <a href="Ulzhan_Khamidolla_Resume.pdf" target="_blank" rel="noopener">resume</a>
+    </div>
+    <div class="meta-row" id="meta-row"></div>
+  </aside>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">
-      <span class="pulse"></span>
-      UC Berkeley · Rise Fellow · Building in AI × Biology
-    </div>
-    <h1>Biology meets AI.<br>I build at the <em>intersection.</em></h1>
-    <p class="hero-sub">
-      Researcher, builder, and founder from Kazakhstan. I model epidemics, train classifiers on human behavior, and ship health AI products — sometimes all in the same semester.
-    </p>
-    <div class="hero-actions">
-      <a href="#work" class="btn-primary">see my projects</a>
-      <a href="#bets" class="btn-ghost">my bets on AI →</a>
-    </div>
-  </div>
-  <div class="hero-right">
-    <div class="world-card">
-      <div class="world-label">researched across 5 countries</div>
-      <div class="globe-dots">
-        <div class="location-pin">
-          <div class="pin-dot"></div>
-          <div class="pin-name">Berkeley<br>USA</div>
-        </div>
-        <div class="location-pin">
-          <div class="pin-dot"></div>
-          <div class="pin-name">Oxford<br>UK</div>
-        </div>
-        <div class="location-pin">
-          <div class="pin-dot"></div>
-          <div class="pin-name">Istanbul<br>Turkey</div>
-        </div>
-        <div class="location-pin">
-          <div class="pin-dot"></div>
-          <div class="pin-name">Tartu<br>Estonia</div>
-        </div>
-        <div class="location-pin">
-          <div class="pin-dot"></div>
-          <div class="pin-name">Astana<br>Kazakhstan</div>
-        </div>
-      </div>
-    </div>
-    <div class="stat-mini-grid">
-      <div class="stat-mini">
-        <div class="stat-mini-num">$4K+</div>
-        <div class="stat-mini-label">startup funding won in competitions</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-num">0.001%</div>
-        <div class="stat-mini-label">Rise Fellowship acceptance rate</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-num">0.78</div>
-        <div class="stat-mini-label">F1 score, NLP behavioral classifier</div>
-      </div>
-      <div class="stat-mini">
-        <div class="stat-mini-num">500+</div>
-        <div class="stat-mini-label">Monte Carlo trials, epidemic models</div>
-      </div>
-    </div>
-  </div>
-  <div class="scroll-hint">
-    <span class="scroll-line"></span>
-    scroll
-  </div>
+  <main class="main" id="main">
+    <section id="about" class="about">
+      <h2 class="h"><canvas class="pi" data-pi="disk" width="8" height="8" aria-hidden="true"></canvas>About</h2>
+      <ul class="terse">
+        <li>Wrote <b>MicroInfer</b>, a transformer inference engine for GPT-2 and TinyLlama: KV-cache, grouped-query attention, INT8 quantization. 2.8x over the naive baseline.</li>
+        <li>Co-founded <b>Quat</b> at Berkeley: batteries for datacenter backup. I wrote the battery firmware in C on an ESP32. NSF I-Corps, 38+ customer interviews, $25K non-dilutive.</li>
+        <li>This semester: ImageJ plugin in the <a href="https://membrane.berkeley.edu/" target="_blank" rel="noopener">Hurley Lab</a>; text-classification pipeline (F1 0.78) in the Social Psychology &amp; Business Lab.</li>
+        <li>Summer 2026 at <b>Silkroad Innovation Hub</b>: built their grants platform end to end, helped run a 50-person fellowship.</li>
+        <li>From Kazakhstan. Built <b>TuzyZhol</b> there: a hiring platform, backed by the Ministry of Labour, now merging into the national one.</li>
+        <li><a href="https://www.risefortheworld.org/" target="_blank" rel="noopener">Rise</a> Global Fellow. Won Anthropic's Hack with Claude. Organize the Central Asian Students Association.</li>
+      </ul>
+      <ul class="now"><li><span>elsewhere</span><div><a href="https://github.com/janeulzhan" target="_blank" rel="noopener">github.com/janeulzhan</a> · <a href="https://www.linkedin.com/in/ulzhan-khamidolla/" target="_blank" rel="noopener">linkedin</a> · <a href="https://github.com/janeulzhan/phasekit" target="_blank" rel="noopener">phasekit</a> · <a href="Ulzhan_Khamidolla_Resume.pdf" target="_blank" rel="noopener">resume (pdf)</a></div></li><li><span>email</span><div>khamidolla.ulzhan@gmail.com</div></li></ul>
+    </section>
+
+    <section id="experience">
+      <h2 class="h"><canvas class="pi" data-pi="case" width="8" height="8" aria-hidden="true"></canvas>Where I've worked</h2>
+      <div class="cards" id="rows"></div>
+      <a class="more" href="#/work">Everything, with details</a>
+    </section>
+
+    <section id="projects">
+      <h2 class="h"><canvas class="pi" data-pi="disk" width="8" height="8" aria-hidden="true"></canvas>Things I've made</h2>
+      <div class="cards" id="proj"></div>
+    </section>
+
+    <section id="recognition">
+      <h2 class="h"><canvas class="pi" data-pi="cup" width="8" height="8" aria-hidden="true"></canvas>Awards and involvement</h2>
+      <ul class="rec" id="rec"></ul>
+    </section>
+
+    <section id="skills">
+      <h2 class="h"><canvas class="pi" data-pi="term" width="8" height="8" aria-hidden="true"></canvas>Skills</h2>
+      <div class="skills" id="skills2"></div>
+    </section>
+
+    <div class="foot">Ulzhan (Jane) Khamidolla · khamidolla.ulzhan@gmail.com · <a href="Ulzhan_Khamidolla_Resume.pdf" target="_blank" rel="noopener">resume</a><br>Last updated October 2026. Logos belong to their owners and appear next to my role or award only.</div>
+  </main>
+</div>
 </div>
 
-<!-- PROJECTS -->
-<div class="section-full" id="work">
-  <div class="inner">
-    <div class="section-label">selected work</div>
-    <div class="section-title">Things I've <em>built</em></div>
+<div class="page" data-page="work"><div class="inner">
+  <a class="back" href="#/">← home</a><h1>Work</h1><p class="lede">All of it, with the specifics.</p>
+  <div class="filters" role="group" aria-label="Filter" id="filters"></div><div id="entries"></div>
+</div></div>
 
-    <div class="projects-grid">
-
-      <!-- Featured: PulmoAI -->
-      <div class="project-card featured fade-up">
-        <div>
-          <div class="proj-tag tag-violet" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">AI · Medical Imaging</div>
-          <div class="proj-title">PulmoAI</div>
-          <div class="proj-desc">Co-founded an ML-based pulmonary disease screening startup using chest X-ray data. Trained a convolutional neural network on open radiograph datasets, achieving ~88% sensitivity on held-out TB cases. Presented clinical implications at Astana Medical University MedTech Conference to physicians and academics.</div>
-          <div class="proj-footer">
-            <span>2023–2024 · Co-founder & technical lead</span>
-            <span class="proj-award">$1,000 seed · IT Hub Battle winner</span>
-          </div>
-        </div>
-        <div class="featured-right">
-          <div class="metric-row">
-            <div class="metric">
-              <div class="metric-val">~88%</div>
-              <div class="metric-label">sensitivity on held-out TB cases</div>
-            </div>
-            <div class="metric">
-              <div class="metric-val">CNN</div>
-              <div class="metric-label">architecture on chest X-ray data</div>
-            </div>
-          </div>
-          <div class="tech-pills">
-            <span class="tech-pill">Python</span>
-            <span class="tech-pill">TensorFlow</span>
-            <span class="tech-pill">OpenCV</span>
-            <span class="tech-pill">NumPy</span>
-            <span class="tech-pill">Scikit-learn</span>
-            <span class="tech-pill">DICOM</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- SUD App -->
-      <div class="project-card teal fade-up">
-        <div class="proj-tag tag-teal">HealthTech · Mobile</div>
-        <div class="proj-title">SUD Support App</div>
-        <div class="proj-desc">Led a 4-person team building a mobile health app for substance use disorder. CBT-based habit tracking, relapse-risk prediction via behavioral patterns, and anonymous peer support. Won 1st place at Amanat Tech Hackathon (250+ participants). Backed by Kazakhstan's Ministry of Labor & Social Protection.</div>
-        <div class="proj-footer">
-          <span>2023 · Team captain & lead developer</span>
-          <span class="proj-award">$3,000 · 1st place, 250+ teams</span>
-        </div>
-      </div>
-
-      <!-- NLP Pipeline -->
-      <div class="project-card fade-up">
-        <div class="proj-tag tag-violet">ML · NLP · Behavioral Science</div>
-        <div class="proj-title">Behavioral NLP Pipeline</div>
-        <div class="proj-desc">Building NLP classification pipelines on 3,000+ longitudinal survey observations at UC Berkeley in collaboration with Cornell. Achieved 0.78 F1 on held-out validation sets. Designing feature engineering frameworks for behavioral process data used in cross-institutional research on social psychology.</div>
-        <div class="proj-footer">
-          <span>2025–present · Berkeley URAP</span>
-          <span>Prof. Cameron Anderson × Cornell</span>
-        </div>
-      </div>
-
-      <!-- Epidemic Models -->
-      <div class="project-card amber fade-up">
-        <div class="proj-tag tag-amber">Computational Biology · Simulation</div>
-        <div class="proj-title">Epidemic Network Models</div>
-        <div class="proj-desc">Built novel hyperbolic latent-space contact networks with stochastic SIR simulations using Gillespie algorithms. Ran 500+ Monte Carlo trials to characterize outbreak variance. Extended agent-based modeling methods under ISTA PI Simon Rella. Research poster presented.</div>
-        <div class="proj-footer">
-          <span>2025 · ISTA × Nazarbayev University</span>
-          <span>Poster presented</span>
-        </div>
-      </div>
-
-      <!-- Geometric Formula -->
-      <div class="project-card fade-up">
-        <div class="proj-tag tag-gray">Mathematics · Algorithm</div>
-        <div class="proj-title">Geometric Optimization Formula</div>
-        <div class="proj-desc">At age 14, derived a novel formula for parameter-constrained area and volume optimization problems, with a computational implementation. Received a letter of appreciation from the Minister of Education of Kazakhstan. Won 1st place at Infomatrix Asia International STEM Competition.</div>
-        <div class="proj-footer">
-          <span>2020 · Age 14</span>
-          <span class="proj-award">Minister of Education recognition</span>
-        </div>
-      </div>
-
-      <!-- Bioinformatics -->
-      <div class="project-card teal fade-up">
-        <div class="proj-tag tag-teal">Bioinformatics · Conservation</div>
-        <div class="proj-title">Marine Species Genomic Analyzer</div>
-        <div class="proj-desc">Built genomic data analysis software for marine species conservation — automated pipeline for sequence alignment, BLAST search, phylogenetic tree construction, and species identification from environmental DNA samples. Won International Award at Infomatrix Asia.</div>
-        <div class="proj-footer">
-          <span>2022–2023 · Infomatrix Asia</span>
-          <span class="proj-award">International Award winner</span>
-        </div>
-      </div>
-
-    </div>
+<div class="page" data-page="fun"><div class="inner">
+  <a class="back" href="#/">← home</a><h1>Fun</h1><p class="lede">Not work.</p>
+  <div class="fun-grid">
+    <article><h3>Bouldering</h3><div class="k">started at V1 · now V4–V5</div><p>Started last semester at V1. On V4s and the occasional V5 now.</p>
+      <div class="grades" aria-label="Grade progress"><span>V0</span><span class="on">V1</span><span class="on">V2</span><span class="on">V3</span><span class="on">V4</span><span class="on">V5</span><span>V6</span><span>V7</span></div></article>
+    <article><h3>Baking</h3><div class="k">weekends</div><p>Bread, mostly. Dorm oven permitting.</p></article>
+    <article class="wide"><h3>Drawing</h3><div class="k">pencil, paper, and this</div><p>A pad. Draw something; it saves in your own browser only.</p>
+      <div class="pad"><canvas id="pad" aria-label="Drawing pad"></canvas>
+        <div class="tools" role="group" aria-label="Pad tools"><button type="button" data-w="2" aria-pressed="true">thin</button><button type="button" data-w="6">thick</button><button type="button" data-w="18">marker</button><button type="button" id="pad-erase">eraser</button><button type="button" id="pad-clear">clear</button><button type="button" id="pad-save">download png</button></div></div></article>
   </div>
-</div>
-
-<!-- RESEARCH TIMELINE -->
-<section id="research">
-  <div class="section-label">research journey</div>
-  <div class="section-title" style="margin-bottom:3rem">Five countries.<br><em>One thread.</em></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;">
-    <div class="timeline">
-      <div class="tl-item fade-up">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2025 – present</div>
-        <div class="tl-title">ML Research Apprentice</div>
-        <div class="tl-org">UC Berkeley × Cornell University</div>
-        <div class="tl-desc">NLP classification on 3,000+ longitudinal behavioral observations. 0.78 F1 on held-out sets. Cross-institutional collaboration with Cornell on social psychology research.</div>
-      </div>
-      <div class="tl-item fade-up">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2025</div>
-        <div class="tl-title">Student Researcher — Complex Epidemics</div>
-        <div class="tl-org">ISTA × Nazarbayev University, Kazakhstan</div>
-        <div class="tl-desc">Stochastic SIR simulations, hyperbolic network models, 500+ Monte Carlo trials. Poster presented. Novel extensions to agent-based epidemic modeling.</div>
-      </div>
-      <div class="tl-item fade-up">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2024</div>
-        <div class="tl-title">Research Intern — Genome Instability Lab</div>
-        <div class="tl-org">Sabanci University, Istanbul, Turkey</div>
-        <div class="tl-desc">Genome rearrangements and phase variation in Bacteroides. 200+ bacterial samples. qPCR gene regulation, plasmid transformation, stress-induced genomic analysis.</div>
-      </div>
-      <div class="tl-item fade-up">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2023</div>
-        <div class="tl-title">Student Researcher — Unknown Protist Lab</div>
-        <div class="tl-org">University of Tartu, Estonia</div>
-        <div class="tl-desc">Identified 16 previously uncultured protist species via 18S rRNA sequencing from environmental water samples. DAPI fluorescence microscopy validation. Poster presented.</div>
-      </div>
-      <div class="tl-item fade-up">
-        <div class="tl-dot"></div>
-        <div class="tl-year">2021</div>
-        <div class="tl-title">Young Explorers Field Researcher</div>
-        <div class="tl-org">National Geographic, North Kazakhstan</div>
-        <div class="tl-desc">Ecosystem and biodiversity field research at Kopa Lake. Co-authored report submitted to National Geographic mentors.</div>
-      </div>
-    </div>
-    <div>
-      <div class="awards-grid" id="awards" style="margin-bottom:2rem;">
-        <div class="award-card fade-up">
-          <div class="award-icon">◆</div>
-          <div class="award-title">Rise Fellow</div>
-          <div class="award-org">Schmidt Futures × Rhodes Trust · $500K · 0.001% acceptance · 2024–present</div>
-        </div>
-        <div class="award-card fade-up">
-          <div class="award-icon">◆</div>
-          <div class="award-title">Girls Who Code</div>
-          <div class="award-org">Summer Immersion Program × BlackRock · Full-stack engineering in fintech · 2022</div>
-        </div>
-        <div class="award-card fade-up">
-          <div class="award-icon">◆</div>
-          <div class="award-title">Strategy Consultant</div>
-          <div class="award-org">Manchester United Foundation · Advised CEO John Shiels on fan engagement strategy · 2025</div>
-        </div>
-        <div class="award-card fade-up">
-          <div class="award-icon">◇</div>
-          <div class="award-title">National Biology Olympiad</div>
-          <div class="award-org">Silver Medal · Kazakhstan</div>
-        </div>
-        <div class="award-card fade-up">
-          <div class="award-icon">◇</div>
-          <div class="award-title">Intl. Economics Olympiad</div>
-          <div class="award-org">3× Silver + Bronze · competing against national teams globally</div>
-        </div>
-        <div class="award-card fade-up">
-          <div class="award-icon">◇</div>
-          <div class="award-title">Infomatrix Asia</div>
-          <div class="award-org">3× International Award Winner · Mathematics, Bioinformatics, Algorithms</div>
-        </div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--cream-dark);border-radius:12px;padding:1.25rem;">
-        <div class="section-label" style="margin-bottom:0.75rem;">public speaking</div>
-        <div style="display:flex;flex-direction:column;gap:0.75rem;">
-          <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;">
-            <div>
-              <div style="font-size:0.875rem;font-weight:600;">Oxford University</div>
-              <div style="font-size:0.8125rem;color:var(--ink-light);">Rise Residential Summit · Computational neuroscience</div>
-            </div>
-            <div style="font-size:0.75rem;color:var(--ink-light);white-space:nowrap;">Aug 2025</div>
-          </div>
-          <div style="height:1px;background:var(--cream-dark);"></div>
-          <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;">
-            <div>
-              <div style="font-size:0.875rem;font-weight:600;">Astana Medical University</div>
-              <div style="font-size:0.8125rem;color:var(--ink-light);">MedTech Conference · Clinical implications of PulmoAI</div>
-            </div>
-            <div style="font-size:0.75rem;color:var(--ink-light);white-space:nowrap;">Apr 2024</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- BETS -->
-<div class="section-full" id="bets">
-  <div class="inner">
-    <div class="section-label">things I believe</div>
-    <div class="section-title">Five bets on <em>AI × biology</em></div>
-    <div class="bets-container">
-      <div class="bet-item fade-up">
-        <div class="bet-num">01</div>
-        <div class="bet-text">The next breakthrough drugs won't be discovered in wet labs — they'll emerge from AI trained on genomic instability patterns no human researcher could trace across millions of samples.</div>
-        <div class="bet-sub">From my work on Bacteroides genome rearrangements at Sabanci University, Istanbul.</div>
-      </div>
-      <div class="bet-item fade-up">
-        <div class="bet-num">02</div>
-        <div class="bet-text">Epidemic modeling is about to be transformed — not by better transmission math, but by LLMs that synthesize real-time behavioral data about why people actually move, gather, and comply.</div>
-        <div class="bet-sub">From my hyperbolic network modeling work under ISTA's Simon Rella.</div>
-      </div>
-      <div class="bet-item fade-up">
-        <div class="bet-num">03</div>
-        <div class="bet-text">Central Asia and Eastern Europe are the most underserved AI markets on earth. Low-resource language models + broken health infrastructure = the highest-impact, most neglected opportunity in global health AI.</div>
-        <div class="bet-sub">I've seen this gap up close building PulmoAI in Kazakhstan.</div>
-      </div>
-      <div class="bet-item fade-up">
-        <div class="bet-num">04</div>
-        <div class="bet-text">Behavioral AI — models that understand the psychology behind choices, not just the choices themselves — is the missing layer in every mental health and addiction app that has ever failed to retain users.</div>
-        <div class="bet-sub">From my NLP work on 3,000+ longitudinal behavioral observations at Berkeley.</div>
-      </div>
-      <div class="bet-item fade-up" style="grid-column: span 2;">
-        <div class="bet-num">05</div>
-        <div class="bet-text">The researcher who can pipette and write a training loop is 10× more valuable than either alone. We're not training those people yet — and the gap between wet-lab intuition and computational power is where the biggest discoveries will happen in the next decade.</div>
-        <div class="bet-sub">That's the gap I'm deliberately building toward, one semester at a time.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ASK ME -->
-<div class="section-full ask-section" id="ask">
-  <div class="inner">
-    <div class="ask-left">
-      <div class="section-label">AI-powered</div>
-      <div class="ask-title">Ask me <em>anything</em></div>
-      <p class="ask-sub">I've built an AI version of myself trained on my research, projects, and ideas. Ask it about my work, what I'm building next, or why I think AI × biology is the most exciting space in tech right now.</p>
-      <div class="sample-questions">
-        <button class="sample-q" onclick="askQuestion('What is PulmoAI and how does it work?')">What is PulmoAI?</button>
-        <button class="sample-q" onclick="askQuestion('What are you building next?')">What are you building next?</button>
-        <button class="sample-q" onclick="askQuestion('Why does biology × AI matter so much to you?')">Why biology × AI?</button>
-        <button class="sample-q" onclick="askQuestion('Tell me about the Rise Fellowship')">The Rise Fellowship</button>
-      </div>
-    </div>
-    <div>
-      <div class="chat-window">
-        <div class="chat-header">
-          <span class="chat-dot"></span>
-          AI Ulzhan · powered by Claude
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="msg msg-ai">Hi! I'm an AI version of Ulzhan. Ask me about my research, projects, or what I'm building — I'm happy to share.</div>
-        </div>
-        <div class="chat-input-row">
-          <input class="chat-input" id="chat-input" type="text" placeholder="Ask me anything..." maxlength="300" />
-          <button class="chat-send" id="chat-send" onclick="sendMessage()">Send</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-left">
-    <div class="footer-name">Ulzhan Khamidolla</div>
-    <p>UC Berkeley · Rise Fellow · khamidolla.ulzhan@gmail.com</p>
-  </div>
-  <div class="footer-links">
-    <a href="https://linkedin.com/in/ulzhan-khamidolla" target="_blank">LinkedIn</a>
-    <a href="https://github.com" target="_blank">GitHub</a>
-    <a href="mailto:khamidolla.ulzhan@gmail.com">Email</a>
-  </div>
-</footer>
+</div></div>
 
 <script>
-// Intersection Observer for fade-in animations
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-}, { threshold: 0.12 });
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+const LOGOS={"anthropic": {"svg": "<svg role=\"img\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><title>Anthropic</title><path d=\"M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z\"/></svg>", "hex": "191919"}, "yc": {"svg": "<svg role=\"img\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><title>Y Combinator</title><path d=\"M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z\"/></svg>", "hex": "F0652F"}, "mongodb": {"svg": "<svg role=\"img\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><title>MongoDB</title><path d=\"M17.193 9.555c-1.264-5.58-4.252-7.414-4.573-8.115-.28-.394-.53-.954-.735-1.44-.036.495-.055.685-.523 1.184-.723.566-4.438 3.682-4.74 10.02-.282 5.912 4.27 9.435 4.888 9.884l.07.05A73.49 73.49 0 0111.91 24h.481c.114-1.032.284-2.056.51-3.07.417-.296.604-.463.85-.693a11.342 11.342 0 003.639-8.464c.01-.814-.103-1.662-.197-2.218zm-5.336 8.195s0-8.291.275-8.29c.213 0 .49 10.695.49 10.695-.381-.045-.765-1.760-.765-2.405z\"/></svg>", "hex": "47A248"}};
+const ORGS=[
+ {id:"hurley",url:"https://membrane.berkeley.edu/",name:"Hurley Lab (MCB/QB3), UC Berkeley",short:"Hurley Lab",role:"Undergraduate Researcher",dates:"Sep 2026 – Present",where:"Berkeley, CA",cat:"research",
+  one:"CALoc, a Fiji/ImageJ plugin for colocalization analysis of microscopy images.",
+  bullets:["Developing and testing CALoc, a Fiji/ImageJ plugin for colocalization analysis of microscopy images; documenting usability issues, failure cases, and feature requests for the plugin's developer"]},
+ {id:"spbl",name:"Social Psychology & Business Lab, UC Berkeley",short:"Social Psych & Business Lab",role:"Machine Learning Researcher",dates:"Sep 2025 – Present",where:"Berkeley, CA",about:"Advisors: Anderson; Hildreth (Cornell)",cat:"research",
+  one:"Text classification pipelines over 3,000+ longitudinal survey observations, F1 0.78 held-out.",
+  bullets:["Built end-to-end text classification pipelines in Python (ingestion, features, training, evaluation) over 3,000+ longitudinal survey observations, fine-tuning transformer models in PyTorch and Hugging Face to F1 0.78","Engineered features from raw behavioral process data for a cross-institutional modeling collaboration with Cornell"]},
+ {id:"quat",name:"Quat",short:"Quat",role:"Embedded Software Engineer, Co-Founder",dates:"Jan 2025 – Aug 2026",where:"Berkeley, CA",about:"Energy-storage startup for datacenter backup power",cat:"startups",
+  one:"Battery management firmware in C on an ESP32 for the first prototype, streaming live telemetry across charge and discharge cycles.",
+  bullets:["Wrote the battery management firmware in C on an ESP32 microcontroller for the first prototype, streaming live telemetry across charge and discharge cycles","Completed NSF I-Corps with 38+ customer interviews, including site visits to 3 Bay Area datacenters","Secured $25K in non-dilutive funding (Microsoft for Startups, MongoDB for Startups)"]},
+ {id:"silkroad",name:"Silkroad Innovation Hub",short:"Silkroad Innovation Hub",role:"Platform Developer, Venture Fellow",dates:"Jul 2026 – Aug 2026",where:"Menlo Park, CA",about:"Venture firm backing Central Eurasian founders",cat:"startups",
+  one:"Built the firm's travel-grants platform end to end: frontend, backend, deployment.",
+  bullets:["Built the firm's travel-grants platform end to end (frontend, backend, deployment), where Central Asian founders and students discover and apply for travel support grants","Ran program set-up for a 50-person fellowship cohort and worked with government ministry delegations from Kazakhstan and Uzbekistan visiting Silicon Valley"]},
+ {id:"epi",name:"Complex Epidemics Lab, ISTA and Nazarbayev University",short:"Complex Epidemics Lab",role:"Computational Research Intern",dates:"May 2025 – Jul 2025",where:"Astana, Kazakhstan",cat:"research",
+  one:"Stochastic SIR and network epidemic models, 500+ Monte Carlo trials; methods section of a lab publication.",
+  bullets:["Built stochastic SIR and network-based epidemic models in Python across 500+ Monte Carlo trials; contributed agent-based modeling extensions and the methods section for a lab publication","Designed a new network generative model combining hyperbolic latent geometry with stochastic block structure"]},
+ {id:"tuzyzhol",name:"TuzyZhol",short:"TuzyZhol",role:"Founder",dates:"2023 – 2024",where:"Kazakhstan",cat:"startups",
+  one:"Hiring platform for people re-entering work after incarceration or addiction recovery; backed by Kazakhstan's Ministry of Labour.",
+  bullets:["Built a hiring platform for people re-entering work after incarceration or addiction recovery; backed by Kazakhstan's Ministry of Labour and Social Protection and now being integrated into the national hiring platform","1st place, Amanat Tech; coverage in 10+ national outlets"]},
+ {id:"berkeley",url:"https://www.berkeley.edu/",name:"University of California, Berkeley",short:"UC Berkeley",role:"B.A. in Data Science (intended)",dates:"Expected May 2029",where:"Berkeley, CA",cat:"education",one:"Sophomore, GPA 3.75.",bullets:["GPA: 3.75","Coursework: DATA C88C (Python), Calculus I, Calculus II (Math 52), STAT 2, STAT 20"]},
+ {id:"yc",url:"https://www.ycombinator.com/",name:"Y Combinator Startup School",short:"YC Startup School",role:"Participant",dates:"2026",cat:"fellowships",one:"Y Combinator Startup School, 2026.",bullets:[]},
+ {id:"rise",url:"https://www.risefortheworld.org/",name:"Rise (Schmidt Futures & Rhodes Trust)",short:"Rise",role:"Rise Global Fellow",dates:"",label:"Fellowship",cat:"fellowships",one:"Rise Global Fellow, featured in Forbes.",bullets:["Featured in Forbes"]},
+ {id:"casa",name:"Central Asian Students Association, UC Berkeley",short:"Central Asian Students Assoc.",role:"Organizer",dates:"",label:"Student org",cat:"fellowships",one:"Organized a 100+ participant Bay Area event.",bullets:["Organized a 100+ participant Bay Area event"]},
+];
+const PROJECTS=[
+ {name:"MicroInfer",stack:"C · Python",link:"https://github.com/janeulzhan",metric:"2.8x over naive baseline",text:"Transformer inference engine for GPT-2 and TinyLlama, from scratch: KV-cache, grouped-query attention, INT8 quantization."},
+ {name:"phasekit",stack:"NumPy · SciPy · pytest · GitHub Actions",link:"https://github.com/janeulzhan/phasekit",metric:"3 algorithms from scratch · 36 tests in CI",text:"Three image-reconstruction algorithms from scratch, with an in-browser demo."},
+ {name:"PulmoAI",stack:"TensorFlow · FastAPI · Docker",metric:"AUC 0.91",text:"Chest X-ray screening classifier, served behind a FastAPI inference API in Docker."},
+ {name:"Rehearsal Room + PeopleDex",stack:"Next.js · TypeScript · MongoDB Atlas",metric:"MongoDB AI Hackathon · top 5 of 94 teams",text:"A voice tool for rehearsing hard conversations. I built the state-reconciliation layer that diffs model output and re-renders only changed fields."},
+ {name:"DNK Student Support Portal",stack:"JavaScript",metric:"public pages · form · admin panel",text:"Application site for a Central Asian student mentorship network."},
+];
+const REC=[["anthropic","Winner, Hack with Claude (Anthropic)","Shipped a working app in 6 hours against 200+ builders; $2,000 prize"],
+ ["mongodb","Top 5 of 94, MongoDB AI Hackathon","Rehearsal Room + PeopleDex"],
+ ["rise","Rise Global Fellow","Schmidt Futures & Rhodes Trust; featured in Forbes"],
+ ["yc","Y Combinator Startup School","2026"],
+ ["tuzyzhol","1st place, Amanat Tech","TuzyZhol; coverage in 10+ national outlets"],
+ ["casa","Organizer, Central Asian Students Association","UC Berkeley; 100+ participant Bay Area event"],
+ ["igem","iGEM Berkeley, dry lab","Computational peptide design team"],
+ ["saas","SAAS Berkeley","Data Foundations committee"]];
+const SKILLS=[["Languages","C, C++, Python, Java, TypeScript, JavaScript, SQL, Bash"],["ML and systems","PyTorch, TensorFlow, Hugging Face Transformers, scikit-learn, NumPy, SciPy, pandas, INT8 quantization, ESP32"],["Tools","Linux, Git, GitHub Actions, Docker, pytest, FastAPI, React, Next.js, MongoDB"]];
 
-// AI Chat
-const SYSTEM_PROMPT = `You are an AI version of Ulzhan Khamidolla, answering questions on her personal website. You speak in first person as Ulzhan. Be warm, intellectually engaged, and concise (2-4 sentences max per reply). Here is Ulzhan's background:
-
-- UC Berkeley freshman (Class of 2029), double major: Molecular & Cellular Biology + Data Science, Minor: Bioengineering. GPA 3.72.
-- Rise Fellow (Schmidt Futures × Rhodes Trust) — 0.001% acceptance rate, lifetime professional support and $500K in educational funding. Fellows recognized by Forbes as most promising youth.
-- Co-founder of PulmoAI: ML-based pulmonary disease screening using chest X-rays. ~88% sensitivity on TB cases. $1,000 seed funding. Presented at Astana Medical University MedTech Conference.
-- Won 1st place ($3,000) at Amanat Tech Hackathon building a mobile health app for substance use disorder. Backed by Kazakhstan's Ministry of Labor.
-- Research at: UC Berkeley (NLP/ML, 0.78 F1 behavioral classifier), ISTA (epidemic network models, 500+ Monte Carlo trials), Sabanci University Istanbul (genome instability), University of Tartu Estonia (protist identification via 18S rRNA), National Geographic field research in Kazakhstan.
-- Speaker at Oxford University (Rise Residential Summit, 2025) and Astana Medical University (2024).
-- Strategy Consultant for Manchester United Foundation, advised CEO John Shiels.
-- Girls Who Code alumna (with BlackRock).
-- Won: National Biology Olympiad Silver (Kazakhstan), 3× Infomatrix Asia International Awards, 3× International Economics Olympiad medals.
-- At age 14, derived a novel geometric optimization formula, recognized by Kazakhstan's Minister of Education.
-- Skills: Python (NumPy, SciPy, Scikit-learn, Pandas), Java, C, R, MATLAB, SQL, Git, stochastic modeling, bioinformatics (BLAST, 18S rRNA, qPCR).
-- Trilingual: English, Kazakh, Russian.
-- From Kazakhstan, now at Berkeley, CA.
-- Core belief: The researcher who can do wet-lab AND write ML code is 10× more valuable than either alone. Central Asia is the most underserved AI market. Behavioral AI is the missing layer in health tech.`;
-
-async function callClaude(userMessage, conversationHistory) {
-  const messages = conversationHistory.map(m => ({
-    role: m.role,
-    content: m.content
-  }));
-  messages.push({ role: 'user', content: userMessage });
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: SYSTEM_PROMPT,
-      messages
-    })
-  });
-  const data = await response.json();
-  return data.content?.[0]?.text || 'Sorry, something went wrong.';
-}
-
-let conversationHistory = [];
-
-function addMessage(text, role) {
-  const msgs = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = `msg msg-${role === 'user' ? 'user' : 'ai'}`;
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function addTyping() {
-  const msgs = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg msg-ai msg-typing';
-  div.id = 'typing-indicator';
-  div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function removeTyping() {
-  const t = document.getElementById('typing-indicator');
-  if (t) t.remove();
-}
-
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const btn = document.getElementById('chat-send');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  btn.disabled = true;
-  addMessage(text, 'user');
-  addTyping();
-
-  try {
-    const reply = await callClaude(text, conversationHistory);
-    removeTyping();
-    conversationHistory.push({ role: 'user', content: text });
-    conversationHistory.push({ role: 'assistant', content: reply });
-    addMessage(reply, 'ai');
-  } catch (e) {
-    removeTyping();
-    addMessage('Something went wrong — try again!', 'ai');
-  }
-  btn.disabled = false;
-}
-
-function askQuestion(q) {
-  document.getElementById('chat-input').value = q;
-  document.getElementById('ask').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => sendMessage(), 400);
-}
-
-document.getElementById('chat-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') sendMessage();
-});
+const GLY={
+ lab:["..wwww..",".w....w.","w..aa..w","w.a..a.w","w..aa..w",".w....w.","..wwww..","........"],
+ bolt:["....ww..","...ww...","..ww....",".wwwwww.","....ww..","...ww...","..ww....","........"],
+ cap:["........","...ww...","..wwww..",".wwwwww.","wwwwwwww","...a....","...a....","..aaa..."],
+ star:["...w....","..www...",".wwwww..","wwwwwww.",".wwwww..","..w.w...",".w...w..","........"],
+ code:["........",".w....w.","w......w","w..aa..w","w......w",".w....w.","........","..a..a.."],
+ wave:["........","a......a",".a....a.","..a..a..","...aa...","...ww...","..w..w..",".w....w."],
+ api:["wwwwwwww","w......w","w.aa.a.w","w......w","w.a.aa.w","w......w","wwwwwwww","........"],
+ chat:[".wwwwww.","w......w","w.a.a..w","w......w","w.aa.a.w",".wwwwww.","..w.....",".w......"],
+ web:["wwwwwwww","w.a.a..w","wwwwwwww","w......w","w.aaa..w","w......w","w.aa...w","wwwwwwww"],
+ medal:["..wwww..",".w....w.","w..aa..w","w.a..a.w",".w.aa.w.","..wwww..","..w..w..",".w....w."],
+ clock:["..wwww..",".w....w.","w..a...w","w..a...w","w..aaa.w",".w....w.","..wwww..","........"],
+ pin:["..wwww..",".w....w.","w..aa..w","w..aa..w",".w....w.","..w..w..","...ww...","....w..."],
+ term:["wwwwwwww","w......w","w.a....w","w..a...w","w.a....w","w...aaaw","w......w","wwwwwwww"]};
+const GPAL={'.':null,'w':'#DDE3F3','a':'#6EE7D1'};
+function glyph(name,cls='px',pal=GPAL){const rows=GLY[name];if(!rows)return'';const c=document.createElement('canvas');c.width=c.height=8;c.className=cls;c.setAttribute('aria-hidden','true');const x=c.getContext('2d');rows.forEach((row,j)=>{for(let i=0;i<8;i++){const col=pal[row[i]];if(col){x.fillStyle=col;x.fillRect(i,j,1,1)}}});return c.outerHTML.replace('<canvas','<canvas data-g="'+name+'"')}
+function paintGlyphs(root){root.querySelectorAll('canvas[data-g]').forEach(c=>{const rows=GLY[c.dataset.g];const x=c.getContext('2d');x.clearRect(0,0,8,8);rows.forEach((row,j)=>{for(let i=0;i<8;i++){const col=GPAL[row[i]];if(col){x.fillStyle=col;x.fillRect(i,j,1,1)}}})})}
+const CATG={research:'lab',startups:'bolt',education:'cap',fellowships:'star'};
+const PROJG={MicroInfer:'term',phasekit:'wave',PulmoAI:'api','Rehearsal Room + PeopleDex':'chat','DNK Student Support Portal':'web'};
+const $=s=>document.querySelector(s);const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const mark=id=>{const L=LOGOS[id];if(L){const hex=parseInt(L.hex,16)<0x303030?'DDE3F3':L.hex;return `<span class="mk">${L.svg.replace('<svg','<svg aria-hidden="true" style="fill:#'+hex+'"')}</span>`}return ''};
+let current=null;
+// experience cards (home: top 6)
+$('#rows').innerHTML=ORGS.slice(0,6).map(o=>`<article class="card"><span class="ico">${glyph(CATG[o.cat])}</span><div class="when">${esc(o.dates||o.label||'')}</div><div><h3>${esc(o.role)} <span class="org">· ${mark(o.id)}${o.url?`<a class="out" href="${o.url}" target="_blank" rel="noopener">${esc(o.short)} ↗</a>`:esc(o.short)}</span></h3><p>${esc(o.one)}</p></div><a class="cover" href="#/work/${o.id}" aria-label="${esc(o.role)} at ${esc(o.name)}"></a></article>`).join('');
+// projects
+$('#proj').innerHTML=PROJECTS.map(p=>`<article class="card" style="position:relative"><span class="ico">${glyph(PROJG[p.name]||'code')}</span><div class="when">${p.link?'<a href="'+p.link+'" target="_blank" rel="noopener" style="color:var(--acc-2)">github</a>':''}</div><div><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p><ul>${p.stack.split(' · ').map(t=>`<li>${esc(t)}</li>`).join('')}${p.metric?`<li class="m">${esc(p.metric)}</li>`:''}</ul></div>${p.link?`<a class="cover" href="${p.link}" target="_blank" rel="noopener" aria-label="${esc(p.name)} on GitHub"></a>`:''}</article>`).join('');
+// recognition
+$('#rec').innerHTML=REC.map(([id,b,s])=>`<li>${mark(id)||glyph('medal')}<div><b>${esc(b)}</b><span>${esc(s)}</span></div></li>`).join('');
+$('#skills2').innerHTML=SKILLS.map(([h,l])=>`<div><h3>${h}</h3><p>${esc(l)}</p></div>`).join('');
+// work page
+const CATS=[['all','all'],['research','research'],['startups','startups'],['education','education'],['fellowships','fellowships + community']];
+$('#filters').innerHTML=CATS.map(([k,l])=>`<button type="button" data-cat="${k}" aria-pressed="${k==='all'}">${l} (${k==='all'?ORGS.length:ORGS.filter(o=>o.cat===k).length})</button>`).join('');
+$('#entries').innerHTML=ORGS.map(o=>`<article class="entry" id="w-${o.id}" data-cat="${o.cat}"><div class="when"><span style="display:inline-block;margin-bottom:8px">${glyph(CATG[o.cat])}</span><b>${esc(o.dates||o.label||'')}</b>${esc(o.where||'')}</div><div><h3>${esc(o.role)}</h3><p class="org">${mark(o.id)}${o.url?`<a href="${o.url}" target="_blank" rel="noopener" style="border-bottom:1px solid var(--dim)">${esc(o.name)} ↗</a>`:esc(o.name)}</p>${o.about?`<p class="about">${esc(o.about)}</p>`:''}${o.bullets.length?`<ul>${o.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`:''}</div></article>`).join('');
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#filters').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));document.querySelectorAll('#entries .entry').forEach(en=>en.hidden=!(b.dataset.cat==='all'||en.dataset.cat===b.dataset.cat))});
+$('#meta-row').innerHTML=`<span>${glyph('pin')}Berkeley, CA</span><span>${glyph('clock')}<b id="clock2">--:--</b> PT</span>`;
+paintGlyphs(document);
+(()=>{function t(){try{const v=new Intl.DateTimeFormat('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Los_Angeles'}).format(new Date());const c2=$('#clock2');if(c2)c2.textContent=v}catch(e){}}t();setInterval(t,15000)})();
+// section nav highlight
+(()=>{const links=[...document.querySelectorAll('.snav a[data-s]')];const secs=links.map(a=>document.getElementById(a.dataset.s));
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(a=>a.removeAttribute('aria-current'));const a=links[secs.indexOf(en.target)];if(a)a.setAttribute('aria-current','true')}})},{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(s=>s&&io.observe(s))})();
+/* ================= TWO SKIES: where I am, where I'm from ================= */
+const PORTRAIT=(()=>{
+  const c=$('#sky');if(!c)return{tick(){}};const x=c.getContext('2d');const W=112,H=64,half=H/2;const img=x.createImageData(W,H),d=img.data;
+  const BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const NIGHT=[11,16,36],DAY=[22,58,80],HOR=[110,231,209];const rnd=(seed)=>{let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}};
+  const stars=[];{const r=rnd(5);for(let i=0;i<40;i++)stars.push([r()*W|0,r()*(half-10)|0,r()])}
+  function hourIn(tz){try{const p=new Intl.DateTimeFormat('en-US',{hour:'numeric',minute:'numeric',hour12:false,timeZone:tz}).formatToParts(new Date());const h=+p.find(q=>q.type==='hour').value%24,m=+p.find(q=>q.type==='minute').value;return{h,m,t:h+m/60,s:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}}catch(e){const n=new Date();return{h:n.getHours(),m:n.getMinutes(),t:n.getHours()+n.getMinutes()/60,s:'--:--'}}}
+  function band(y0,t,seed){
+    const day=Math.max(0,Math.min(1,1-Math.abs(t-12.5)/6.8));const day2=Math.pow(day,.6);
+    for(let y=0;y<half;y++)for(let xx=0;xx<W;xx++){const k=((y0+y)*W+xx)*4;const v=y/half;
+      let col=[0,1,2].map(i=>NIGHT[i]*(1-day2)+DAY[i]*day2);col=col.map((cv,i)=>cv*(1-v*.35)+HOR[i]*v*.18*day2);
+      const q=(BAYER[y&3][xx&3]/16-.5)*10;d[k]=col[0]+q;d[k+1]=col[1]+q;d[k+2]=col[2]+q;d[k+3]=255}
+    if(day<.25)for(const[sx,sy,b]of stars){if((sx*7+seed)%3===0)continue;const k=((y0+sy)*W+sx)*4;const a=(1-day*4)*(.5+.5*b);d[k]=d[k]*(1-a)+221*a;d[k+1]=d[k+1]*(1-a)+227*a;d[k+2]=d[k+2]*(1-a)+243*a}
+    const ph=(t-6)/13;const isSun=ph>=0&&ph<=1;const p2=isSun?ph:((t<6?t+5:t-19)/11);const px=Math.round(8+p2*(W-16)),py=Math.round(half-8-Math.sin(p2*Math.PI)*(half-14));
+    const col=isSun?[242,181,68]:[221,227,243];for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){if(dx*dx+dy*dy>10)continue;if(!isSun&&dx>0&&dy<1&&dx*dx+dy*dy<=6)continue;const yy=py+dy,xx=px+dx;if(xx<0||xx>=W||yy<0||yy>=half)continue;const k=((y0+yy)*W+xx)*4;d[k]=col[0];d[k+1]=col[1];d[k+2]=col[2]}
+    for(let xx=0;xx<W;xx++){const k=((y0+half-2)*W+xx)*4;d[k]=110;d[k+1]=231;d[k+2]=209;d[k+3]=255;const k2=((y0+half-1)*W+xx)*4;d[k2]=14;d[k2+1]=20;d[k2+2]=44}}
+  let last=0;function tick(){const now=Date.now();if(now-last<15000)return;last=now;const a=hourIn('America/Los_Angeles'),b=hourIn('Asia/Almaty');band(0,a.t,1);band(half,b.t,2);x.putImageData(img,0,0);
+    $('#sky-a').textContent='Berkeley '+a.s;$('#sky-b').textContent='Astana '+b.s}
+  tick();return{tick}})();
+/* ================= PIXEL SECTION ICONS ================= */
+const ICONS=(()=>{
+  const P={'.':null,'k':'#0B1021','w':'#DDE3F3','g':'#7C87A6','y':'#F2B544','r':'#E06C75','a':'#6EE7D1','b':'#9FB4DA'};
+  const S={case:[["........",".wwwwww.","wwwwwwww","wggggggw","wggggggw","wwwwwwww","wwwwwwww","........"],["........",".wwwwww.","wwwwwwww","wggggggw","wgggyggw","wwwwwwww","wwwwwwww","........"]],
+    disk:[["wwwwwww.","wkkkkkww","wkkkkkww","wwwwwwww","wwggggww","wwgwwgww","wwggggww","wwwwwwww"],["wwwwwww.","wkkkkkww","wkykkkww","wwwwwwww","wwggggww","wwgwwgww","wwggggww","wwwwwwww"]],
+    term:[["wwwwwwww","wkkkkkkw","wkakkkkw","wkkakkkw","wkakkkkw","wkkkkkkw","wkkkkkkw","wwwwwwww"],["wwwwwwww","wkkkkkkw","wkakkkkw","wkkakkkw","wkakkakw","wkkkkkkw","wkkkkkkw","wwwwwwww"]],
+    cup:[[".yyyyyy.",".yyyyyy.","yyyyyyyy",".yyyyyy.","..yyyy..","...yy...","..yyyy..",".yyyyyy."],[".yyyyyy.",".ywyyyy.","yyyyyyyy",".yyyyyy.","..yyyy..","...yy...","..yyyy..",".yyyyyy."]]};
+  const draw=(cv,rows)=>{const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);rows.forEach((row,j)=>{for(let i=0;i<row.length;i++){const c=P[row[i]];if(c){x.fillStyle=c;x.fillRect(i,j,1,1)}}})};
+  const els=[...document.querySelectorAll('canvas.pi')];let f=0;
+  function tick(){f++;els.forEach(cv=>draw(cv,S[cv.dataset.pi][(f>>3)&1]))}
+  tick();return{tick}})();
+(function loop(){const now=performance.now();if(!loop.l||now-loop.l>125){loop.l=now;if(!document.hidden){ICONS.tick()}}if(!loop.p||now-loop.p>33){loop.p=now;if(!document.hidden)PORTRAIT.tick()}requestAnimationFrame(loop)})();
+/* ================= DRAWING PAD ================= */
+(()=>{const c=$('#pad');if(!c)return;const x=c.getContext('2d');let w=2,erase=false,down=false,px=0,py=0,dpr=1,sized=false;
+  const KEY='uk-pad-v1';
+  function size(){const r=c.getBoundingClientRect();if(r.width<10)return;dpr=Math.min(2,devicePixelRatio||1);const img=sized?c.toDataURL():null;c.width=r.width*dpr;c.height=r.height*dpr;x.setTransform(dpr,0,0,dpr,0,0);x.lineCap=x.lineJoin='round';sized=true;
+    let saved=img;if(!saved){try{saved=localStorage.getItem(KEY)}catch(e){}}if(saved){const im=new Image();im.onload=()=>x.drawImage(im,0,0,r.width,r.height);im.src=saved}}
+  function pos(e){const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+  c.addEventListener('pointerdown',e=>{if(!sized)size();down=true;c.setPointerCapture(e.pointerId);[px,py]=pos(e);x.beginPath();x.arc(px,py,w/2,0,7);x.fillStyle=erase?'#0A0F22':'#E8E8E3';x.fill()});
+  c.addEventListener('pointermove',e=>{if(!down)return;const[nx,ny]=pos(e);x.strokeStyle=erase?'#0A0F22':'#E8E8E3';x.lineWidth=erase?w*3:w;x.beginPath();x.moveTo(px,py);x.lineTo(nx,ny);x.stroke();px=nx;py=ny});
+  const up=()=>{if(down){down=false;try{localStorage.setItem(KEY,c.toDataURL())}catch(e){}}};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+  document.querySelectorAll('.pad .tools [data-w]').forEach(b=>b.addEventListener('click',()=>{w=+b.dataset.w;erase=false;document.querySelectorAll('.pad .tools button').forEach(q=>q.setAttribute('aria-pressed',q===b))}));
+  $('#pad-erase').addEventListener('click',e=>{erase=true;document.querySelectorAll('.pad .tools button').forEach(q=>q.setAttribute('aria-pressed',q===e.currentTarget))});
+  $('#pad-clear').addEventListener('click',()=>{x.clearRect(0,0,c.width,c.height);try{localStorage.removeItem(KEY)}catch(e){}});
+  $('#pad-save').addEventListener('click',()=>{const a=document.createElement('a');a.download='doodle.png';a.href=c.toDataURL();a.click()});
+  new IntersectionObserver(es=>{if(es[0].isIntersecting&&!sized)size()}).observe(c);addEventListener('resize',()=>{if(sized)size()})})();
+/* router */
+const TITLES={home:'Ulzhan Khamidolla',work:'Work · Ulzhan Khamidolla',fun:'Fun · Ulzhan Khamidolla'};
+function route(first){const h=location.hash||'';if(!h.startsWith('#/')){current='home';document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.dataset.page==='home'));document.title=TITLES.home;return}
+  const[name,anchor]=h.replace(/^#\//,'').split('/');const page=TITLES[name]?name:'home';
+  if(page!==current){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.dataset.page===page));document.title=TITLES[page];scrollTo(0,0);current=page;if(!first){const h1=$(`.page[data-page="${page}"] h1`);if(h1){h1.tabIndex=-1;h1.focus({preventScroll:true})}}}
+  if(anchor){const el=document.getElementById('w-'+anchor);if(el)setTimeout(()=>{el.scrollIntoView({block:'center'});el.animate([{background:'rgba(110,231,209,.12)'},{background:'transparent'}],{duration:1600})},80)}}
+addEventListener('hashchange',()=>route(false));route(true);
 </script>
 </body>
 </html>
